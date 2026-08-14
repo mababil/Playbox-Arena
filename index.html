@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PLAYBOX ARENA — Rental PlayStation Premium</title>
+  <meta name="description" content="Rental PlayStation premium untuk nongkrong bareng teman. Harga terjangkau, pelayanan profesional, dan pengalaman gaming terbaik." />
+  <meta name="keywords" content="rental ps, playstation, gaming, nongkrong, playbox arena" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Sora', sans-serif;
+      background: #0F0F10;
+      color: #FFFFFF;
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    body.light-mode {
+      background: #F5F5F7;
+      color: #1A1A1A;
+    }
+    ::selection { background: #F5C400; color: #111; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0F0F10; }
+    body.light-mode ::-webkit-scrollbar-track { background: #F5F5F7; }
+    ::-webkit-scrollbar-thumb { background: #F5C400; border-radius: 20px; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* CURSOR-REACTIVE BACKGROUND */
+    #bg-canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none; display: block;
+    }
+    #bg-glow {
+      position: fixed; top: 0; left: 0; width: 480px; height: 480px;
+      border-radius: 50%; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle, rgba(245,196,0,0.16) 0%, rgba(245,196,0,0.05) 45%, rgba(245,196,0,0) 70%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      will-change: transform;
+    }
+    body.light-mode #bg-glow {
+      background: radial-gradient(circle, rgba(245,196,0,0.22) 0%, rgba(245,196,0,0.08) 45%, rgba(245,196,0,0) 70%);
+    }
+    nav, section, footer, #loader, #progress-bar, .floating-wa, .back-top {
+      position: relative; z-index: 1;
+    }
+
+    /* LOADING */
+    #loader {
+      position: fixed; inset: 0; background: #0F0F10; display: flex;
+      align-items: center; justify-content: center; z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    body.light-mode #loader { background: #F5F5F7; }
+    #loader.hide { opacity: 0; visibility: hidden; }
+    .loader-spinner {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 4px solid rgba(245, 196, 0, 0.15);
+      border-top-color: #F5C400;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* BUTTON */
+    .btn {
+      display: inline-block; padding: 14px 36px; border-radius: 60px;
+      font-weight: 600; font-size: 1rem; border: none; cursor: pointer;
+      transition: all 0.3s ease; background: #F5C400; color: #111;
+      box-shadow: 0 8px 24px rgba(245, 196, 0, 0.25);
+    }
+    .btn:hover { background: #FFD84D; transform: translateY(-3px); box-shadow: 0 12px 32px rgba(245, 196, 0, 0.45); }
+    .btn-outline {
+      background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    body.light-mode .btn-outline { color: #1A1A1A; border: 1.5px solid rgba(0,0,0,0.2); }
+    .btn-outline:hover { background: rgba(245,196,0,0.08); border-color: #F5C400; color: #F5C400; }
+    .btn-sm { padding: 10px 24px; font-size: 0.85rem; }
+
+    /* SCROLL PROGRESS */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, #F5C400, #FFD84D);
+      z-index: 999; width: 0%; transition: width 0.15s;
+    }
+
+    /* THEME TOGGLE - SWITCH */
+    .theme-switch-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .theme-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    body.light-mode .theme-switch {
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .theme-switch .slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      background: #F5C400;
+      border-radius: 50%;
+      transition: 0.3s;
+      box-shadow: 0 2px 8px rgba(245,196,0,0.4);
+    }
+    body.light-mode .theme-switch .slider {
+      left: 26px;
+      background: #F5C400;
+    }
+    .theme-switch .icon-sun,
+    .theme-switch .icon-moon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.7rem;
+      opacity: 0.5;
+      transition: 0.3s;
+    }
+    .theme-switch .icon-sun { left: 6px; }
+    .theme-switch .icon-moon { right: 6px; }
+    body.light-mode .theme-switch .icon-sun { opacity: 1; }
+    body:not(.light-mode) .theme-switch .icon-moon { opacity: 1; }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; padding: 16px 0;
+      z-index: 1000; background: rgba(15,15,16,0.7);
+      backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+    body.light-mode .navbar {
+      background: rgba(255,255,255,0.85);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+    .logo {
+      font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo img { height: 40px; width: auto; }
+    .logo span { color: #F5C400; }
+    .nav-menu {
+      display: flex; gap: 32px; list-style: none; font-weight: 500;
+      align-items: center;
+    }
+    .nav-menu a {
+      position: relative; font-size: 0.95rem; transition: color 0.3s;
+      color: #BDBDBD;
+    }
+    body.light-mode .nav-menu a { color: #555; }
+    .nav-menu a:hover, .nav-menu a.active { color: #F5C400; }
+    .nav-menu a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0%; height: 2px; background: #F5C400;
+      transition: width 0.3s ease;
+    }
+    .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+    }
+    .hamburger span {
+      width: 28px; height: 2.5px; background: #fff;
+      border-radius: 4px; transition: 0.3s;
+    }
+    body.light-mode .hamburger span { background: #1A1A1A; }
+
+    /* HERO */
+    .hero {
+      padding: 140px 0 80px; min-height: 100vh;
+      display: flex; align-items: center; position: relative;
+    }
+    .hero .container {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero-content h1 {
+      font-size: 4.2rem; font-weight: 800; line-height: 1.1; letter-spacing: -1px;
+    }
+    .hero-content h1 span { color: #F5C400; }
+    .hero-content .sub {
+      font-size: 1.3rem; font-weight: 300; color: #BDBDBD; margin: 16px 0 8px;
+    }
+    body.light-mode .hero-content .sub { color: #666; }
+    .hero-content .typewriter {
+      display: flex; align-items: center; gap: 2px;
+      font-size: 1.3rem; font-weight: 600; color: #F5C400; margin: 4px 0 0;
+      min-height: 1.6rem;
+    }
+    .hero-content .typewriter .typed-cursor {
+      display: inline-block; width: 2px; height: 1.1em;
+      background: #F5C400; margin-left: 2px;
+      animation: blink-cursor 0.8s steps(1) infinite;
+    }
+    @keyframes blink-cursor { 50% { opacity: 0; } }
+    .hero-content p {
+      color: #BDBDBD; max-width: 500px; margin: 20px 0 32px; font-size: 1.05rem;
+    }
+    body.light-mode .hero-content p { color: #666; }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero-image {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hero-image img {
+      max-width: 100%; border-radius: 32px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6); transition: transform 0.5s ease;
+    }
+    .hero-image img:hover { transform: scale(1.02); }
+    /* SECTION */
+    section { padding: 80px 0; }
+    .section-title {
+      font-size: 2.6rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px;
+    }
+    .section-title span { color: #F5C400; }
+    .section-sub {
+      color: #BDBDBD; margin-bottom: 48px; font-size: 1.1rem;
+    }
+    body.light-mode .section-sub { color: #666; }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: center;
+    }
+    .about-text p {
+      color: #BDBDBD; font-size: 1.05rem; margin-bottom: 28px;
+    }
+    body.light-mode .about-text p { color: #555; }
+    .about-icons {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .about-icon-item {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.03); padding: 12px 18px;
+      border-radius: 40px; border: 1px solid rgba(255,255,255,0.05);
+      font-weight: 500; font-size: 0.95rem;
+    }
+    body.light-mode .about-icon-item {
+      background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
+    }
+    .about-icon-item .icon { font-size: 1.4rem; }
+    .about-image {
+      position: relative;
+      background: linear-gradient(160deg, #1A1A1A 0%, #141414 100%);
+      border-radius: 28px; padding: 22px;
+      text-align: center; border: 1px solid rgba(245,196,0,0.15);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 280px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.02) inset;
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+    .about-image::before {
+      content: ''; position: absolute; inset: -2px; border-radius: 28px; padding: 2px;
+      background: linear-gradient(135deg, rgba(245,196,0,0.55), rgba(245,196,0,0) 35%, rgba(245,196,0,0) 65%, rgba(245,196,0,0.4));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none; opacity: 0.9;
+    }
+    .about-image::after {
+      content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,196,0,0.22) 0%, rgba(245,196,0,0) 70%);
+      pointer-events: none;
+    }
+    .about-image:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.03) inset;
+      border-color: rgba(245,196,0,0.35);
+    }
+    body.light-mode .about-image {
+      background: linear-gradient(160deg, #FFFFFF 0%, #FAFAFA 100%);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+    .about-image img {
+      max-width: 78%; margin: 0 auto; position: relative; z-index: 1;
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    body.light-mode .about-image img { box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+    .about-image .logo-text {
+      font-size: 3rem; font-weight: 900; letter-spacing: 8px;
+      color: #F5C400; margin-top: 10px;
+    }
+    .about-image .logo-sub {
+      position: relative; z-index: 1;
+      font-size: 0.85rem; color: #BDBDBD; letter-spacing: 4px;
+      margin-top: 16px; padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      width: 100%;
+    }
+    body.light-mode .about-image .logo-sub { color: #888; border-top: 1px solid rgba(0,0,0,0.08); }
+
+    /* GAME SLIDER */
+    .game-slider-wrapper {
+      position: relative; overflow: hidden; border-radius: 28px;
+      background: #1A1A1A; padding: 24px 0 30px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    body.light-mode .game-slider-wrapper {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08);
+    }
+    .game-slider-track {
+      display: flex; gap: 24px;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+      padding: 0 16px;
+    }
+    .game-card {
+      flex: 0 0 200px; background: rgba(255,255,255,0.03);
+      border-radius: 20px; padding: 16px; text-align: center;
+      border: 1px solid rgba(255,255,255,0.05); transition: 0.4s;
+    }
+    body.light-mode .game-card {
+      background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);
+    }
+    .game-card:hover {
+      transform: translateY(-8px); border-color: #F5C400;
+      box-shadow: 0 12px 40px rgba(245,196,0,0.1);
+    }
+    .game-card .img-wrapper {
+      width: 100%; aspect-ratio: 1/1; border-radius: 14px;
+      overflow: hidden; background: #0F0F10;
+    }
+    body.light-mode .game-card .img-wrapper { background: #F0F0F0; }
+    .game-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; transition: 0.4s;
+    }
+    .game-card:hover img { transform: scale(1.05); }
+    .game-card h4 { margin-top: 12px; font-size: 0.95rem; font-weight: 700; }
+    .game-card .year {
+      color: #BDBDBD; font-size: 0.8rem; font-weight: 500;
+    }
+    body.light-mode .game-card .year { color: #888; }
+    .game-card .tag {
+      display: inline-block; background: #F5C400; color: #111;
+      font-size: 0.6rem; font-weight: 800; padding: 2px 12px;
+      border-radius: 20px; margin-top: 6px; text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .game-slider-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(20,27,38,0.9); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.08); color: #f0f4fc;
+      font-size: 1.4rem; padding: 12px 16px; border-radius: 50px;
+      cursor: pointer; transition: 0.3s; z-index: 5;
+    }
+    body.light-mode .game-slider-btn {
+      background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.08);
+      color: #1A1A1A;
+    }
+    .game-slider-btn:hover { background: #F5C400; color: #111; border-color: #F5C400; }
+    .game-slider-btn-left { left: 12px; }
+    .game-slider-btn-right { right: 12px; }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 28px;
+    }
+    .feature-card {
+      background: #1A1A1A; border-radius: 24px; padding: 32px 20px;
+      text-align: center; transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    body.light-mode .feature-card {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(245,196,0,0.08);
+      border-color: rgba(245,196,0,0.2);
+    }
+    .feature-card .icon { font-size: 2.6rem; margin-bottom: 16px; }
+    .feature-card h4 { font-size: 1.2rem; margin-bottom: 6px; }
+    .feature-card p { color: #BDBDBD; font-size: 0.95rem; }
+    body.light-mode .feature-card p { color: #666; }
+
+    /* PRICING */
+    .pricing-category { margin-bottom: 48px; }
+    .pricing-category:last-child { margin-bottom: 0; }
+    .pricing-category .cat-title {
+      font-size: 1.5rem; font-weight: 700; color: #F5C400;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .pricing-category .cat-title .badge {
+      background: rgba(245,196,0,0.12); padding: 4px 16px;
+      border-radius: 40px; font-size: 0.75rem; color: #F5C400;
+      font-weight: 400;
+    }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
+    }
+    .pricing-card {
+      background: #1A1A1A; border-radius: 28px; padding: 28px 20px 24px;
+      text-align: center; border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease; position: relative; overflow: hidden;
+    }
+    body.light-mode .pricing-card {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .pricing-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg,transparent,#F5C400,transparent);
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .pricing-card:hover::before { opacity: 1; }
+    .pricing-card:hover {
+      transform: translateY(-8px); border-color: rgba(245,196,0,0.2);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+    .pricing-card .name { font-size: 1.1rem; font-weight: 600; }
+    .pricing-card .price {
+      font-size: 1.8rem; font-weight: 700; color: #F5C400;
+      margin: 8px 0 16px;
+    }
+    .pricing-card .price small {
+      font-size: 0.8rem; font-weight: 400; color: #BDBDBD;
+    }
+    body.light-mode .pricing-card .price small { color: #888; }
+    .pricing-card .specs {
+      color: #BDBDBD; font-size: 0.85rem; margin-bottom: 16px; line-height: 1.8;
+    }
+    body.light-mode .pricing-card .specs { color: #888; }
+    .pricing-card .specs span { display: block; }
+    .pricing-card .btn { width: 100%; padding: 12px; font-size: 0.9rem; }
+    .pricing-card.popular {
+      border-color: rgba(245,196,0,0.3);
+      background: rgba(245,196,0,0.04);
+    }
+    body.light-mode .pricing-card.popular {
+      background: rgba(245,196,0,0.06);
+    }
+    .pricing-card.popular .badge-pop {
+      position: absolute; top: 12px; right: 12px;
+      background: #F5C400; color: #111; font-size: 0.65rem;
+      font-weight: 700; padding: 4px 12px; border-radius: 40px;
+      letter-spacing: 0.5px;
+    }
+
+    /* FLOW ORDER - CARD STYLE */
+    .flow-container {
+      background: #1A1A1A; border-radius: 32px; padding: 50px 40px;
+      border: 1px solid rgba(255,255,255,0.05);
+      position: relative; overflow: hidden;
+    }
+    body.light-mode .flow-container {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .flow-container::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(245,196,0,0.03), transparent 70%);
+      border-radius: 50%;
+    }
+    .flow-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 20px; position: relative; z-index: 1;
+    }
+    .flow-card {
+      background: rgba(255,255,255,0.03); border-radius: 24px;
+      padding: 28px 20px; text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+    body.light-mode .flow-card {
+      background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);
+    }
+    .flow-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: #F5C400;
+      box-shadow: 0 12px 40px rgba(245,196,0,0.1);
+    }
+    .flow-card .step-num {
+      display: inline-block; background: #F5C400; color: #111;
+      width: 36px; height: 36px; line-height: 36px;
+      border-radius: 50%; font-weight: 800; font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+    .flow-card .icon { font-size: 2.2rem; color: #F5C400; margin-bottom: 12px; }
+    .flow-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .flow-card p {
+      font-size: 0.8rem; color: #BDBDBD; line-height: 1.5;
+    }
+    body.light-mode .flow-card p { color: #888; }
+    .flow-arrow-badge {
+      position: absolute; right: -18px; top: 50%;
+      transform: translateY(-50%);
+      background: #F5C400; color: #111; width: 32px; height: 32px;
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 0.9rem;
+      box-shadow: 0 4px 16px rgba(245,196,0,0.3);
+    }
+    .flow-card:last-child .flow-arrow-badge { display: none; }
+    .flow-sub {
+      text-align: center; color: #BDBDBD; margin-top: 32px;
+      font-size: 1rem; position: relative; z-index: 1;
+    }
+    body.light-mode .flow-sub { color: #888; }
+    .flow-sub i { color: #F5C400; margin: 0 4px; }
+
+    /* SYARAT & KETENTUAN */
+    .terms-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px;
+    }
+    .terms-card {
+      background: #1A1A1A; border-radius: 20px; padding: 28px 22px;
+      border: 1px solid rgba(255,255,255,0.05); text-align: left;
+      display: flex; gap: 16px; align-items: flex-start;
+      transition: all 0.3s ease;
+    }
+    body.light-mode .terms-card {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .terms-card:hover {
+      transform: translateY(-6px); border-color: rgba(245,196,0,0.3);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.25);
+    }
+    .terms-card .num {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+      background: #F5C400; color: #111; font-weight: 800; font-size: 0.95rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .terms-card .icon { font-size: 1.6rem; margin-bottom: 10px; display: block; }
+    .terms-card p { font-size: 0.92rem; font-weight: 600; color: #EDEDED; line-height: 1.5; }
+    body.light-mode .terms-card p { color: #222; }
+    .terms-notice {
+      margin-top: 28px; display: flex; align-items: center; gap: 16px;
+      background: rgba(245,196,0,0.08); border: 1px solid rgba(245,196,0,0.25);
+      border-radius: 16px; padding: 18px 24px;
+    }
+    body.light-mode .terms-notice { background: rgba(245,196,0,0.12); }
+    .terms-notice .warn-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .terms-notice strong { color: #F5C400; }
+    .terms-notice p { font-size: 0.92rem; color: #EDEDED; }
+    body.light-mode .terms-notice p { color: #333; }
+
+    /* FOUNDER */
+    .founder-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 28px;
+    }
+    .founder-card {
+      background: #1A1A1A; border-radius: 28px; padding: 28px 20px 24px;
+      text-align: center; transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    body.light-mode .founder-card {
+      background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .founder-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      border-color: rgba(245,196,0,0.25);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+    }
+    .founder-card .avatar {
+      width: 110px; height: 110px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 16px;
+      border: 3px solid rgba(245,196,0,0.15);
+      transition: all 0.4s ease;
+    }
+    .founder-card:hover .avatar {
+      border-color: #F5C400; transform: scale(1.05);
+    }
+    .founder-card h4 { font-size: 1.15rem; font-weight: 700; }
+    .founder-card .role {
+      color: #BDBDBD; font-size: 0.85rem; margin-bottom: 14px;
+    }
+    body.light-mode .founder-card .role { color: #888; }
+    .founder-card .social-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.05); padding: 8px 20px;
+      border-radius: 40px; color: #BDBDBD; font-size: 0.85rem;
+      transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05);
+    }
+    body.light-mode .founder-card .social-link {
+      background: rgba(0,0,0,0.04); color: #666;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .founder-card .social-link:hover {
+      background: rgba(245,196,0,0.12); color: #F5C400;
+      border-color: rgba(245,196,0,0.2); transform: translateY(-2px);
+    }
+
+    /* GALLERY */
+    .testimoni-slider {
+      position: relative; overflow: hidden; border-radius: 32px;
+      background: #1A1A1A; padding: 0;
+    }
+    body.light-mode .testimoni-slider { background: #FFFFFF; }
+    .testimoni-track {
+      display: flex; transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .testimoni-item {
+      min-width: 100%; padding: 0; position: relative;
+    }
+    .testimoni-item img {
+      width: 100%; height: 500px; object-fit: cover; border-radius: 32px;
+    }
+    .testimoni-item .caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 40px 32px 28px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      border-radius: 0 0 32px 32px;
+    }
+    .testimoni-item .caption h4 { font-size: 1.2rem; font-weight: 700; }
+    .testimoni-item .caption p { color: #BDBDBD; font-size: 0.95rem; }
+    .testimoni-indicators {
+      display: flex; justify-content: center; gap: 10px; margin-top: 24px;
+    }
+    .testimoni-indicators span {
+      width: 10px; height: 10px; border-radius: 20px;
+      background: rgba(255,255,255,0.15); cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    body.light-mode .testimoni-indicators span {
+      background: rgba(0,0,0,0.15);
+    }
+    .testimoni-indicators span.active { width: 32px; background: #F5C400; }
+    .testimoni-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 2; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.08); color: #fff;
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; cursor: pointer; transition: all 0.3s ease;
+      opacity: 0;
+    }
+    body.light-mode .testimoni-nav {
+      background: rgba(255,255,255,0.8); color: #1A1A1A;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .testimoni-slider:hover .testimoni-nav { opacity: 1; }
+    .testimoni-nav:hover { background: rgba(245,196,0,0.2); border-color: #F5C400; }
+    .testimoni-nav.prev { left: 16px; }
+    .testimoni-nav.next { right: 16px; }
+
+    /* CTA */
+    .cta-section {
+      background: #F5C400; border-radius: 40px; padding: 60px 40px;
+      text-align: center; color: #111;
+    }
+    .cta-section h2 { font-size: 2.8rem; font-weight: 700; }
+    .cta-section p {
+      font-size: 1.2rem; margin: 12px 0 28px; opacity: 0.85;
+    }
+    .cta-section .btn {
+      background: #111; color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .cta-section .btn:hover { background: #2a2a2a; color: #F5C400; }
+
+    /* FOOTER */
+    footer {
+      padding: 60px 0 30px; border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    body.light-mode footer { border-top: 1px solid rgba(0,0,0,0.05); }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand .logo { font-size: 1.8rem; }
+    .footer-brand p {
+      color: #BDBDBD; margin-top: 12px; max-width: 300px;
+    }
+    body.light-mode .footer-brand p { color: #888; }
+    .footer-menu h4, .footer-social h4 { font-weight: 600; margin-bottom: 16px; }
+    .footer-menu a, .footer-social a {
+      display: block; color: #BDBDBD; margin-bottom: 10px; transition: 0.3s;
+    }
+    .footer-social a i { width: 16px; margin-right: 8px; text-align: center; }
+    body.light-mode .footer-menu a, body.light-mode .footer-social a { color: #888; }
+    .footer-menu a:hover, .footer-social a:hover { color: #F5C400; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;
+      text-align: center; color: #BDBDBD; font-size: 0.9rem;
+    }
+    body.light-mode .footer-bottom {
+      border-top: 1px solid rgba(0,0,0,0.05); color: #888;
+    }
+
+    /* FLOATING */
+    .floating-wa {
+      position: fixed; bottom: 30px; right: 30px; z-index: 999;
+      background: #25D366; width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; box-shadow: 0 8px 28px rgba(37,211,102,0.4);
+      transition: 0.3s; color: #fff;
+    }
+    .floating-wa:hover { transform: scale(1.08); }
+    .back-top {
+      position: fixed; bottom: 100px; right: 30px; z-index: 999;
+      background: rgba(245,196,0,0.15); backdrop-filter: blur(4px);
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; border: 1px solid rgba(245,196,0,0.2);
+      color: #F5C400; transition: 0.3s; opacity: 0; pointer-events: none;
+    }
+    .back-top.visible { opacity: 1; pointer-events: auto; }
+    .back-top:hover { background: #F5C400; color: #111; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.8s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(40px); transition: all 0.8s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .hero .container { grid-template-columns: 1fr; text-align: center; }
+      .hero-content p { margin: 20px auto; }
+      .hero-buttons { justify-content: center; }
+      .about-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: repeat(2,1fr); }
+      .pricing-grid { grid-template-columns: repeat(2,1fr); }
+      .founder-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .flow-grid { grid-template-columns: repeat(3,1fr); }
+      .flow-arrow-badge { display: none; }
+      .terms-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none; flex-direction: column;
+        background: rgba(15,15,16,0.98); padding: 24px;
+        border-radius: 20px; position: absolute; top: 70px;
+        left: 20px; right: 20px; gap: 16px;
+        backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05);
+      }
+      body.light-mode .nav-menu {
+        background: rgba(255,255,255,0.98);
+        border: 1px solid rgba(0,0,0,0.05);
+      }
+      .nav-menu.open { display: flex; }
+      .hamburger { display: flex; }
+      .hero-content h1 { font-size: 2.6rem; }
+      .features-grid, .pricing-grid, .founder-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .cta-section { padding: 40px 20px; }
+      .cta-section h2 { font-size: 2rem; }
+      .testimoni-item img { height: 300px; }
+      .testimoni-nav { opacity: 1; width: 36px; height: 36px; font-size: 1rem; }
+      .testimoni-nav.prev { left: 8px; }
+      .testimoni-nav.next { right: 8px; }
+      .game-card { flex: 0 0 160px; }
+      .game-slider-btn { padding: 8px 12px; font-size: 1rem; }
+      .flow-grid { grid-template-columns: 1fr 1fr; }
+      .terms-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .flow-grid { grid-template-columns: 1fr; }
+      .terms-grid { grid-template-columns: 1fr; }
+      .hero-content h1 { font-size: 2rem; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .founder-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- CURSOR-REACTIVE BACKGROUND -->
+  <canvas id="bg-canvas"></canvas>
+  <div id="bg-glow"></div>
+
+  <!-- LOADING -->
+  <div id="loader"><div class="loader-spinner"></div></div>
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <div class="logo">
+        <img src="images/logo.jpeg" alt="PLAYBOX ARENA" style="height:44px; width:44px; object-fit:cover; border-radius:10px;" />
+        <span>PLAYBOX ARENA</span>
+      </div>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#game">Game</a></li>
+        <li><a href="#price">Price</a></li>
+        <li><a href="#order">Order</a></li>
+        <li><a href="#testimoni">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#founder">Managed by</a></li>
+        <li>
+          <div class="theme-switch-wrapper">
+            <div class="theme-switch" id="themeSwitch">
+              <span class="icon-sun">☀️</span>
+              <span class="slider"></span>
+              <span class="icon-moon">🌙</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content reveal">
+        <h1>PLAYBOX <span>ARENA</span></h1>
+        <div class="typewriter"><span id="typedText"></span><span class="typed-cursor"></span></div>
+        <div class="sub">Rental PlayStation Premium untuk Nongkrong Bareng Teman.</div>
+        <p>Nikmati pengalaman bermain PlayStation dengan kualitas terbaik, harga terjangkau, dan pelayanan profesional.</p>
+        <div class="hero-buttons">
+          <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn">Pesan Sekarang</a>
+          <a href="#price" class="btn btn-outline">Lihat Pricelist</a>
+        </div>
+      </div>
+      <div class="hero-image reveal-right">
+        <img src="https://images.unsplash.com/photo-1758524944389-51662fefe820?fm=jpg&q=80&w=1200&auto=format&fit=crop" alt="Nongkrong main PlayStation bareng teman" onerror="this.parentElement.innerHTML='<div style=\'font-size:8rem;color:#F5C400;\'>🎮</div>'" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <h2 class="section-title">Tentang <span>Kami</span></h2>
+          <p>PLAYBOX ARENA merupakan penyedia jasa rental PlayStation yang menghadirkan pengalaman bermain yang nyaman, modern, dan menyenangkan untuk berbagai acara seperti nongkrong, ulang tahun, gathering, hingga event komunitas.</p>
+          <div class="about-icons">
+            <div class="about-icon-item"><span class="icon">🎮</span> Console Berkualitas</div>
+            <div class="about-icon-item"><span class="icon">🎯</span> Controller Original</div>
+            <div class="about-icon-item"><span class="icon">⚡</span> Pelayanan Cepat</div>
+            <div class="about-icon-item"><span class="icon">💰</span> Harga Terjangkau</div>
+          </div>
+        </div>
+        <div class="about-image reveal-right">
+          <!-- Ganti src dengan logo Anda -->
+          <img src="images/logo.jpeg" alt="Mortal Kombat">
+          <div class="logo-sub">#PlayboxArena</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME COLLECTION -->
+  <section id="game">
+    <div class="container">
+      <h2 class="section-title reveal">🎮 <span>Game Collection</span></h2>
+      <p class="section-sub reveal">Pilih game favoritmu dan mainkan dengan kualitas terbaik.</p>
+      
+      <div class="game-slider-wrapper">
+        <button class="game-slider-btn game-slider-btn-left" id="gameSliderLeft"><i class="fas fa-chevron-left"></i></button>
+        <div class="game-slider-track" id="gameSliderTrack">
+          <!-- Ganti src dengan gambar cover game -->
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/it2.jpg" alt="It Takes Two"></div>
+            <h4>It Takes Two</h4><span e="year">2021</span><div class="tag">Adventure</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/tekken.jpg" alt="Tekken"></div>
+            <h4>Tekken</h4><span class="year">2024</span><div class="tag">Fighting</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/gta.png" alt="GTA"></div>
+            <h4>Grand Theft Auto V</h4><span class="year">2013</span><div class="tag">Action</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/efootball.jpg" alt="eFootball"></div>
+            <h4>eFootball</h4><span class="year">2026</span><div class="tag">Sport</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/mc.jpg" alt="Mortal Kombat"></div>
+            <h4>Mortal Kombat</h4><span class="year"> 2023 </span><div class="tag"> Fighting </div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/re.jpg" alt="Resident Evil"></div>
+            <h4>Resident Evil</h4><span class="year">2023</span><div class="tag">Horror</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/nba.jpg" alt="NBA"></div>
+            <h4>NBA 2K</h4><span class="year">2026</span><div class="tag">Sport</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/ctr.jpg" alt="Crash Team Racing"></div>
+            <h4>Crash Team Racing</h4><span class="year">2019</span><div class="tag">Racing</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/awo.jpg" alt="A Way Out"></div>
+            <h4>A Way Out</h4><span class="year">2018</span><div class="tag">Adventure</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/ufc.jpg" alt="UFC"></div>
+            <h4>UFC</h4><span class="year">2023</span><div class="tag">Sport</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/cod.jpg" alt="Call of Duty"></div>
+            <h4>Call of Duty</h4><span class="year">2023</span><div class="tag">Action</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/fc.jpg" alt="FIFA"></div>
+            <h4>FIFA</h4><span class="year">2026</span><div class="tag">Sport</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/motogp.jpg" alt="MotoGP"></div>
+            <h4>MotoGP</h4><span class="year">2023</span><div class="tag">Racing</div>
+          </div>
+          <div class="game-card">
+            <div class="img-wrapper"><img src="images/naruto.jpg" alt="Naruto"></div>
+            <h4>Naruto</h4><span class="year">2023</span><div class="tag">Action</div>
+          </div>
+        </div>
+        <button class="game-slider-btn game-slider-btn-right" id="gameSliderRight"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <h2 class="section-title reveal">Keunggulan <span>Kami</span></h2>
+      <div class="features-grid">
+        <div class="feature-card reveal"><div class="icon">⚡</div><h4>Pelayanan Cepat</h4><p>Respon ramah & cepat</p></div>
+        <div class="feature-card reveal" style="transition-delay:0.1s;"><div class="icon">🏆</div><h4>Harga Terbaik</h4><p>Termurah & kompetitif</p></div>
+        <div class="feature-card reveal" style="transition-delay:0.2s;"><div class="icon">🔧</div><h4>Peralatan Berkualitas</h4><p>PS & TV premium</p></div>
+        <div class="feature-card reveal" style="transition-delay:0.3s;"><div class="icon">🎉</div><h4>Support Event</h4><p>Gathering, ulang tahun</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICELIST -->
+  <section id="price">
+    <div class="container">
+      <h2 class="section-title reveal">Pricelist <span>Premium</span></h2>
+      <p class="section-sub reveal">Pilih paket sesuai kebutuhan gaming Anda.</p>
+
+      <div class="pricing-category reveal">
+        <div class="cat-title">🔥 Promo Spesial <span class="badge">Semua Hari</span></div>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="name">Paket 1 Jam</div>
+            <div class="price">Rp 15.000</div>
+            <div class="specs"><span>⏱ 1 jam bermain</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+          <div class="pricing-card">
+            <div class="name">Paket 2 Jam</div>
+            <div class="price">Rp 30.000</div>
+            <div class="specs"><span>⏱ 2 jam bermain</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+          <div class="pricing-card popular">
+            <div class="badge-pop">⭐ POPULER</div>
+            <div class="name">Paket 3 Jam</div>
+            <div class="price">Rp 40.000 <small style="text-decoration:line-through; opacity:0.55;">Rp 45.000</small></div>
+            <div class="specs"><span>⏱ 3 jam bermain</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+          <div class="pricing-card">
+            <div class="name">Paket 4 Jam</div>
+            <div class="price">Rp 55.000 <small style="text-decoration:line-through; opacity:0.55;">Rp 60.000</small></div>
+            <div class="specs"><span>⏱ 4 jam bermain</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+          <div class="pricing-card">
+            <div class="name">Paket 5 Jam</div>
+            <div class="price">Rp 70.000</div>
+            <div class="specs"><span>⏱ 5 jam bermain</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-category reveal" style="transition-delay:0.15s;">
+        <div class="cat-title">🕐 24 Jam <span class="badge">All Day</span></div>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="name">Weekdays</div>
+            <div class="price">Rp 150.000</div>
+            <div class="specs"><span>📅 Senin – Jumat</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+          <div class="pricing-card">
+            <div class="name">Weekend</div>
+            <div class="price">Rp 170.000</div>
+            <div class="specs"><span>📅 Sabtu – Minggu</span><span>🎮 2 console</span></div>
+            <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn btn-sm">Pesan</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARA MEMESAN - CARD STYLE -->
+  <section id="order">
+    <div class="container">
+      <h2 class="section-title reveal">📋 <span>Cara Memesan</span></h2>
+      <p class="section-sub reveal">Mudah, cepat, dan aman. Ikuti langkah-langkah berikut.</p>
+      
+      <div class="flow-container reveal">
+        <div class="flow-grid">
+          <div class="flow-card">
+            <div class="step-num">1</div>
+            <div class="icon">💬</div>
+            <h4>Pesan</h4>
+            <p>Hubungi kami via WhatsApp atau telepon</p>
+            <div class="flow-arrow-badge"><i class="fas fa-arrow-right"></i></div>
+          </div>
+          <div class="flow-card">
+            <div class="step-num">2</div>
+            <div class="icon">📦</div>
+            <h4>Pilih Paket</h4>
+            <p>Tentukan durasi dan jenis paket yang diinginkan</p>
+            <div class="flow-arrow-badge"><i class="fas fa-arrow-right"></i></div>
+          </div>
+          <div class="flow-card">
+            <div class="step-num">3</div>
+            <div class="icon">📝</div>
+            <h4>Isi Data</h4>
+            <p>Lengkapi data pemesan dan alamat tujuan</p>
+            <div class="flow-arrow-badge"><i class="fas fa-arrow-right"></i></div>
+          </div>
+          <div class="flow-card">
+            <div class="step-num">4</div>
+            <div class="icon">🏍️</div>
+            <h4>Deliver</h4>
+            <p>Kami antar console ke lokasi Anda</p>
+            <div class="flow-arrow-badge"><i class="fas fa-arrow-right"></i></div>
+          </div>
+          <div class="flow-card">
+            <div class="step-num">5</div>
+            <div class="icon">💳</div>
+            <h4>Pembayaran</h4>
+            <p>Bayar setelah console sampai di tangan Anda</p>
+          </div>
+        </div>
+
+        <div class="flow-sub">
+          <i class="fas fa-check-circle"></i> Konsultasi gratis &nbsp;|&nbsp; <i class="fas fa-clock"></i> Respon cepat &nbsp;|&nbsp; <i class="fas fa-shield-alt"></i> Aman & terpercaya
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYARAT & KETENTUAN -->
+  <section id="terms">
+    <div class="container">
+      <h2 class="section-title reveal">📜 Syarat & <span>Ketentuan</span></h2>
+      <p class="section-sub reveal">Mohon dibaca sebelum melakukan penyewaan Playbox.</p>
+
+      <div class="terms-grid">
+        <div class="terms-card reveal">
+          <div class="num">1</div>
+          <p>Jaminan minimal 2 identitas SIM/KTP + STNK (wajib)</p>
+        </div>
+        <div class="terms-card reveal" style="transition-delay:0.1s;">
+          <div class="num">2</div>
+          <p>Bersedia di foto saat menerima unit Playbox</p>
+        </div>
+        <div class="terms-card reveal" style="transition-delay:0.2s;">
+          <div class="num">3</div>
+          <p>Kerusakan PS/Stik/Monitor dll menjadi tanggung jawab penyewa</p>
+        </div>
+        <div class="terms-card reveal" style="transition-delay:0.3s;">
+          <div class="num">4</div>
+          <p>Dilarang connect WiFi/Internet</p>
+        </div>
+      </div>
+
+      <div class="terms-notice reveal">
+        <div class="warn-icon">⚠️</div>
+        <p><strong>PENTING!</strong> Dengan menyewa, berarti Anda setuju dengan semua syarat & ketentuan di atas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="testimoni">
+    <div class="container">
+      <h2 class="section-title reveal">Dokumentasi <span>Kegiatan</span></h2>
+      <p class="section-sub reveal">Lihat suasana seru bermain di PLAYBOX ARENA.</p>
+      <div class="testimoni-slider">
+        <div class="testimoni-track" id="testiTrack">
+          <div class="testimoni-item">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%231A1A1A'/%3E%3Ctext x='400' y='250' font-size='28' text-anchor='middle' fill='%23BDBDBD' font-family='Sora'%3E📸 Dokumentasi 1%3C/text%3E%3Ctext x='400' y='290' font-size='16' text-anchor='middle' fill='%23666'%3E%3C/text%3E%3C/svg%3E" alt="Dokumentasi 1" />
+            <div class="caption"><h4>🎮 Seru Bareng Teman</h4><p>Suasana nongkrong di PLAYBOX ARENA</p></div>
+          </div>
+          <div class="testimoni-item">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%231A1A1A'/%3E%3Ctext x='400' y='250' font-size='28' text-anchor='middle' fill='%23BDBDBD' font-family='Sora'%3E📸 Dokumentasi 2%3C/text%3E%3Ctext x='400' y='290' font-size='16' text-anchor='middle' fill='%23666'%3E%3C/text%3E%3C/svg%3E" alt="Dokumentasi 2" />
+            <div class="caption"><h4>🎉 Event Gathering</h4><p>Acara komunitas gaming bersama</p></div>
+          </div>
+          <div class="testimoni-item">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%231A1A1A'/%3E%3Ctext x='400' y='250' font-size='28' text-anchor='middle' fill='%23BDBDBD' font-family='Sora'%3E📸 Dokumentasi 3%3C/text%3E%3Ctext x='400' y='290' font-size='16' text-anchor='middle' fill='%23666'%3E%3C/text%3E%3C/svg%3E" alt="Dokumentasi 3" />
+            <div class="caption"><h4>🏆 Turnamen Seru</h4><p>Kompetisi gaming antar pelanggan</p></div>
+          </div>
+          <div class="testimoni-item">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%231A1A1A'/%3E%3Ctext x='400' y='250' font-size='28' text-anchor='middle' fill='%23BDBDBD' font-family='Sora'%3E📸 Dokumentasi 4%3C/text%3E%3Ctext x='400' y='290' font-size='16' text-anchor='middle' fill='%23666'%3E%3C/text%3E%3C/svg%3E" alt="Dokumentasi 4" />
+            <div class="caption"><h4>🎂 Ulang Tahun di PLAYBOX</h4><p>Rayakan momen spesial bersama kami</p></div>
+          </div>
+        </div>
+        <button class="testimoni-nav prev" id="prevTesti">‹</button>
+        <button class="testimoni-nav next" id="nextTesti">›</button>
+        <div class="testimoni-indicators" id="testiIndicators"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="cta-section reveal">
+        <h2>Siap Main Bareng?</h2>
+        <p>Rasakan pengalaman gaming terbaik di PLAYBOX ARENA.</p>
+        <a href="https://wa.me/message/MTDDYPIXANDUC1" class="btn">Pesan Sekarang</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEET FOUNDER (di bawah Contact) -->
+  <section id="founder">
+    <div class="container">
+      <h2 class="section-title reveal">Managed<span>By</span></h2>
+      <div class="founder-grid">
+        <div class="founder-card reveal">
+          <img src="images/ambii.jpg" alt="ababil">
+          <h4>Muhammad Ababil</h4>
+          <a href="https://www.instagram.com/mababil11?igsh=dWRzbzVvZ2thejJq&igsi=dWRzbzVvZ2thejJq" target="_blank" rel="noopener" class="social-link"><span class="ig-icon"><i class="fa-brands fa-instagram"></i></span> @mababil11</a>
+        </div>
+        <div class="founder-card reveal" style="transition-delay:0.1s;">
+          <img src="images/robi.jpg" alt="robi">
+          <h4>Robi Fernando</h4>
+          <a href="https://www.instagram.com/robifernando_?igsh=eWs4ZDN6N2Z6cHJ1&igsi=eWs4ZDN6N2Z6cHJ1" target="_blank" rel="noopener" class="social-link"><span class="ig-icon"><i class="fa-brands fa-instagram"></i></span> @ROBI FERNANDO</a>
+        </div>
+        <div class="founder-card reveal" style="transition-delay:0.2s;">
+          <img src="images/bebet.jpg" alt="bebet">
+          <h4>Betra Wahyudi</h4>
+          <a href="https://www.instagram.com/betrawy70?igsh=M2dramJwa3B6YTFy&igsi=M2dramJwa3B6YTFy" target="_blank" rel="noopener" class="social-link"><span class="ig-icon"><i class="fa-brands fa-instagram"></i></span> @betrawy70</a>
+        </div>
+        <div class="founder-card reveal" style="transition-delay:0.3s;">
+          <img src="images/aan.jpg" alt="abdi">
+          <h4>Abdi Sohibul</h4>
+          <a href="https://www.instagram.com/abdishblmnri?igsh=MXR5c3V0a214d3Z0NA==" target="_blank" rel="noopener" class="social-link"><span class="ig-icon"><i class="fa-brands fa-instagram"></i></span> @abdishblmnri</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span>PLAYBOX ARENA</span></div>
+          <p>Rental PlayStation premium untuk nongkrong seru.</p>
+        </div>
+        <div class="footer-menu">
+          <h4>Menu</h4>
+          <a href="#hero">Home</a>
+          <a href="#about">About</a>
+          <a href="#game">Game</a>
+          <a href="#price">Price</a>
+        </div>
+        <div class="footer-menu">
+          <h4>Lainnya</h4>
+          <a href="#order">Order</a>
+          <a href="#testimoni">Gallery</a>
+          <a href="#contact">Contact</a>
+          <a href="#founder">Managed by</a>
+        </div>
+        <div class="footer-social">
+          <h4>Kontak</h4>
+          <a href="https://wa.me/message/MTDDYPIXANDUC1" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.instagram.com/playboxarena.id?igsh=MTIybzBjams1NG9lNg==" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> Instagram</a>
+          <a href="https://www.tiktok.com/@playboxarena.id?_r=1&_t=ZS-98t1uTqby4r" target="_blank" rel="noopener"><i class="fa-brands fa-tiktok"></i> TikTok</a>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2026 PLAYBOX ARENA. Your Play, Your Arena.</div>
+    </div>
+  </footer>
+
+  <!-- FLOATING -->
+  <a href="https://wa.me/message/MTDDYPIXANDUC1" class="floating-wa" aria-label="WhatsApp">💬</a>
+  <button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+  <script>
+    // LOADING
+    window.addEventListener('load', () => {
+      document.getElementById('loader').classList.add('hide');
+    });
+
+    // CURSOR-REACTIVE BACKGROUND (particles + glow)
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      const glow = document.getElementById('bg-glow');
+      let w, h, particles = [];
+      let mouse = { x: null, y: null };
+      const isLight = () => document.body.classList.contains('light-mode');
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const COUNT = Math.min(90, Math.floor((window.innerWidth * window.innerHeight) / 14000));
+      function makeParticle() {
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          r: Math.random() * 1.8 + 0.6
+        };
+      }
+      for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        glow.style.opacity = '1';
+        glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      });
+      window.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          mouse.x = e.touches[0].clientX;
+          mouse.y = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        const dotColor = isLight() ? '245,196,0' : '245,196,0';
+        const lineColor = isLight() ? '0,0,0' : '255,255,255';
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (mouse.x !== null) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const influenceRadius = 140;
+            if (dist < influenceRadius && dist > 0.01) {
+              const force = (influenceRadius - dist) / influenceRadius;
+              p.x += (dx / dist) * force * 1.4;
+              p.y += (dy / dist) * force * 1.4;
+            }
+          }
+
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${dotColor}, 0.55)`;
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const ddx = p.x - q.x, ddy = p.y - q.y;
+            const d = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (d < 110) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = `rgba(${lineColor}, ${0.06 * (1 - d / 110)})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // TYPEWRITER TEXT
+    (function () {
+      const el = document.getElementById('typedText');
+      if (!el) return;
+      const phrases = ['Your Play, Your Arena.'];
+      let phraseIndex = 0, charIndex = 0, deleting = false;
+
+      function tick() {
+        const current = phrases[phraseIndex % phrases.length];
+        if (!deleting) {
+          charIndex++;
+          el.textContent = current.slice(0, charIndex);
+          if (charIndex === current.length) {
+            deleting = true;
+            setTimeout(tick, 1800);
+            return;
+          }
+        } else {
+          charIndex--;
+          el.textContent = current.slice(0, charIndex);
+          if (charIndex === 0) {
+            deleting = false;
+            phraseIndex++;
+          }
+        }
+        setTimeout(tick, deleting ? 45 : 90);
+      }
+      tick();
+    })();
+
+    // THEME TOGGLE - SWITCH
+    const themeSwitch = document.getElementById('themeSwitch');
+    const body = document.body;
+
+    if (localStorage.getItem('theme') === 'light') {
+      body.classList.add('light-mode');
+    }
+
+    themeSwitch.addEventListener('click', () => {
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+      } else {
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // NAVBAR
+    const navMenu = document.getElementById('navMenu');
+    const hamburger = document.getElementById('hamburger');
+    hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+    document.querySelectorAll('.nav-menu a:not(.theme-switch-wrapper)').forEach(link => {
+      link.addEventListener('click', () => navMenu.classList.remove('open'));
+    });
+
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-menu a:not(.theme-switch-wrapper)');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const top = section.offsetTop - 200;
+        if (window.scrollY >= top) current = section.getAttribute('id');
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+      });
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      document.getElementById('progress-bar').style.width = progress + '%';
+      document.getElementById('backTop').classList.toggle('visible', scrollTop > 400);
+    });
+    document.getElementById('backTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // SCROLL REVEAL
+    const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    // GAME SLIDER
+    const gameTrack = document.getElementById('gameSliderTrack');
+    const gameLeft = document.getElementById('gameSliderLeft');
+    const gameRight = document.getElementById('gameSliderRight');
+    const gameWrapper = document.querySelector('.game-slider-wrapper');
+
+    let gameIndex = 0;
+    let gameCardWidth = 200 + 24;
+    let gameVisible = Math.floor(gameWrapper.clientWidth / gameCardWidth);
+
+    function getGameMax() {
+      return Math.max(0, gameTrack.children.length - gameVisible);
+    }
+
+    function updateGameSlider() {
+      const max = getGameMax();
+      if (gameIndex > max) gameIndex = max;
+      if (gameIndex < 0) gameIndex = 0;
+      const offset = gameIndex * gameCardWidth;
+      gameTrack.style.transform = `translateX(-${offset}px)`;
+      gameLeft.style.opacity = gameIndex === 0 ? '0.3' : '1';
+      gameRight.style.opacity = gameIndex >= max ? '0.3' : '1';
+    }
+
+    gameRight.addEventListener('click', () => {
+      const max = getGameMax();
+      if (gameIndex < max) gameIndex++;
+      else gameIndex = 0;
+      updateGameSlider();
+      resetGameAutoplay();
+    });
+
+    gameLeft.addEventListener('click', () => {
+      if (gameIndex > 0) gameIndex--;
+      else gameIndex = getGameMax();
+      updateGameSlider();
+      resetGameAutoplay();
+    });
+
+    window.addEventListener('resize', () => {
+      const wrapperWidth = gameWrapper.clientWidth;
+      const gap = 24;
+      const card = 200;
+      let count = Math.floor((wrapperWidth - 32) / (card + gap));
+      if (count < 1) count = 1;
+      gameVisible = count;
+      updateGameSlider();
+    });
+    updateGameSlider();
+
+    // GAME SLIDER - AUTOPLAY (jalan sendiri)
+    let gameAutoplayTimer = null;
+    function gameAutoplayStep() {
+      const max = getGameMax();
+      if (gameIndex < max) gameIndex++;
+      else gameIndex = 0;
+      updateGameSlider();
+    }
+    function startGameAutoplay() {
+      stopGameAutoplay();
+      gameAutoplayTimer = setInterval(gameAutoplayStep, 3000);
+    }
+    function stopGameAutoplay() {
+      if (gameAutoplayTimer) { clearInterval(gameAutoplayTimer); gameAutoplayTimer = null; }
+    }
+    function resetGameAutoplay() { startGameAutoplay(); }
+    gameWrapper.addEventListener('mouseenter', stopGameAutoplay);
+    gameWrapper.addEventListener('mouseleave', startGameAutoplay);
+    gameWrapper.addEventListener('touchstart', stopGameAutoplay, { passive: true });
+    startGameAutoplay();
+
+    // GALLERY SLIDER
+    const track = document.getElementById('testiTrack');
+    const indicators = document.getElementById('testiIndicators');
+    const items = track.children;
+    let current = 0;
+    const total = items.length;
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('span');
+      dot.dataset.index = i;
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goTo(i));
+      indicators.appendChild(dot);
+    }
+
+    function goTo(index) {
+      current = index;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      document.querySelectorAll('.testimoni-indicators span').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
+
+    document.getElementById('prevTesti').addEventListener('click', () => {
+      goTo((current - 1 + total) % total);
+    });
+    document.getElementById('nextTesti').addEventListener('click', () => {
+      goTo((current + 1) % total);
+    });
+
+    let autoSlide = setInterval(() => {
+      goTo((current + 1) % total);
+    }, 5000);
+
+    const sliderContainer = document.querySelector('.testimoni-slider');
+    sliderContainer.addEventListener('mouseenter', () => clearInterval(autoSlide));
+    sliderContainer.addEventListener('mouseleave', () => {
+      autoSlide = setInterval(() => {
+        goTo((current + 1) % total);
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
